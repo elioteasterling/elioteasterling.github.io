@@ -62,7 +62,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://elioteasterling.github.io/
     #needs: test
     runs-on: ubuntu-latest
     name: Deploy
