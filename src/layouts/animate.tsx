@@ -1,20 +1,23 @@
 import { motion, useCycle } from 'framer-motion'
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
-export const useDimensions = ref => {
-  const dimensions = useRef({ width: 0, height: 0 });
+const saying = ["help pull,",  "me out",  "of the", "fire, before",   "i die"]
+const colors = [   "#FF008C", "#D309E1", "#9C1AFF",      "#7700FF", "#4400FF"]
+
+export const useElementSize = (ref) => {
+  const dimensions = useRef({ width: 0, height: 0 })
 
   useEffect(() => {
-    dimensions.current.width = ref.current.offsetWidth;
-    dimensions.current.height = ref.current.offsetHeight;
+    dimensions.current.width  = ref.current.offsetWidth
+    dimensions.current.height = ref.current.offsetHeight
   }, []);
 
-  return dimensions.current;
-};
+  return dimensions.current
+}
 
 const sidebar = {
   open: (height = 1000) => ({
-    clipPath: `circle(${height * 1.25 + 100}px at 40px 40px)`,
+    clipPath: `circle(${height * 2 + 500}px at 40px 40px)`,
     transition: {
       type: "spring",
       stiffness: 20,
@@ -32,15 +35,10 @@ const sidebar = {
   }
 };
 
-export const Example = () => {
-  const [isOpen, toggleOpen] = useCycle(false, true);
-  const containerRef = useRef(null);
-  const { height } = useDimensions(containerRef);
-
-  function click(e) {
-    e.preventDefault()
-    if (isOpen) toggleOpen()
-  }
+export function SideNavFab() {
+  const [isOpen, toggleOpen] = useCycle(false, true)
+  const containerRef = useRef(null)
+  const { height } = useElementSize(containerRef)
 
   return (
     <motion.nav
@@ -53,8 +51,8 @@ export const Example = () => {
       <Navigation />
       <MenuToggle toggle={() => toggleOpen()} />
     </motion.nav>
-  );
-};
+  )
+}
 
 const variants = {
     open: {
@@ -66,17 +64,40 @@ const variants = {
         duration: 0.7,
         transition: { staggerChildren: 0.05, staggerDirection: -1, delayChildren: 0.125 }
     }
-};
-  
-  export const Navigation = () => (
-    <motion.div variants={variants}>
-        <motion.ul>
-        {colors.map((c, i) => (
-            <MenuItem c={c} i={i} key={i} />
-        ))}
-        </motion.ul>
-    </motion.div>
-  );
+}
+
+const avatarAnimation = { transform: 'rotateY(180deg)', transition: {
+    delay: 0.25,
+    type: "spring",
+    stiffness: 400,
+    damping: 10
+  } }
+
+  export function Navigation() {
+    const [hovered, hoverEnd] = useCycle(false, true)
+    const [imgvs, setImgvs] = useState(undefined)
+
+    function hover() {
+        if (!hovered) {
+            hoverEnd()
+            setImgvs(avatarAnimation)
+            setTimeout(() => {
+                hoverEnd()
+                setImgvs({})
+            }, 700)
+        }
+    }
+    return (
+        <motion.div variants={variants}>
+            <motion.img className='avatar' src='src/assets/gir.png' alt='Girvatar' animate={imgvs} onHoverStart={() => hover()} />
+            <motion.ul>
+            {colors.map((c, i) => (
+                <MenuItem c={c} i={i} key={i} />
+            ))}
+            </motion.ul>
+        </motion.div>
+    )
+  }
 
 
 
@@ -98,8 +119,7 @@ const variants = {
     }
   }
 
-  const saying = ["help pull,", "me out", "of the", "fire, before", "i die"]
-  const colors = ["#FF008C", "#D309E1", "#9C1AFF", "#7700FF", "#4400FF"]
+
   
   export const MenuItem = ({ c, i }) => {
     const style = { border: `2px solid ${c}` }
@@ -119,11 +139,11 @@ const variants = {
     )
   }
 
-const Path = props => (
+const Path = (props: any) => (
   <motion.path
     fill="transparent"
     strokeWidth="3"
-    stroke="hsl(0, 0%, 18%)"
+    stroke="white"
     strokeLinecap="round"
     {...props}
   />
